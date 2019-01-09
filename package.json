@@ -10,6 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/react-native-component/react-native-smart-amap.git"
   },
+  "dependencies": {
+    "prop-types": "^15.6.2"
+  },
   "keywords": [
     "react-native",
     "smart",

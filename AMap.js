@@ -14,11 +14,11 @@ import IOSAMap from './AMap-ios'
 
 let AMap
 
-if(Platform.OS == 'ios') {
-    AMap = IOSAMap
+if(Platform.OS === 'ios') {
+    AMap = IOSAMap;//require('./AMap-ios');
 }
 else {
-    AMap = AndroidAMap
+    AMap = AndroidAMap;//require('./AMap-android');
 }
 
 export default AMap
