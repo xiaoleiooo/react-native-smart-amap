@@ -1,6 +1,8 @@
 package com.reactnativecomponent.amap;
 
 
+import android.util.Log;
+
 import com.amap.api.maps2d.model.LatLng;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
@@ -26,9 +28,12 @@ public class RCTAMapManager extends ViewGroupManager<RCTAMapView> {
 
     @ReactProp(name = "options")
     public void setOptions(RCTAMapView view, final ReadableMap Map) {
+        Log.e("setOptions",Map.toString());
+
         if(Map.hasKey("centerCoordinate")) {
             ReadableMap centerCoordinateMap = Map.getMap("centerCoordinate");
             view.setLatLng(new LatLng(centerCoordinateMap.getDouble("latitude"), centerCoordinateMap.getDouble("longitude")));
+            view.setCenterLocation(centerCoordinateMap.getDouble("latitude"), centerCoordinateMap.getDouble("longitude"));
         }
         if(Map.hasKey("zoomLevel")) {
             double zoomLevel = Map.getDouble("zoomLevel");
@@ -37,6 +42,10 @@ public class RCTAMapManager extends ViewGroupManager<RCTAMapView> {
         if(Map.hasKey("centerMarker")) {
             String centerMarker = Map.getString("centerMarker");
             view.setCenterMarker(centerMarker);
+        }
+        if(Map.hasKey("showsUserLocation")){
+            boolean showsUserLocation = Map.getBoolean("showsUserLocation");
+
         }
     }
 

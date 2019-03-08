@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -30,6 +31,7 @@ import com.amap.api.maps2d.model.CircleOptions;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
+import com.amap.api.maps2d.model.MyLocationStyle;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
@@ -43,7 +45,7 @@ import static com.amap.api.maps2d.AMapOptions.ZOOM_POSITION_RIGHT_CENTER;
 
 
 
-public class RCTAMapView extends FrameLayout implements LocationSource, AMapLocationListener, AMap.OnCameraChangeListener {
+public class RCTAMapView extends FrameLayout implements LocationSource, AMapLocationListener, AMap.OnMyLocationChangeListener, AMap.OnCameraChangeListener {
     private String centerMarker = "";
     private String locationMarker = "";
     private static int SCROLL_BY_PX = 1;
@@ -166,7 +168,6 @@ public class RCTAMapView extends FrameLayout implements LocationSource, AMapLoca
 
         AMAP = MAPVIEW.getMap();
         AMAP.setMapType(AMap.MAP_TYPE_NORMAL);// 矢量地图模式
-
         mapUiSettings = AMAP.getUiSettings();//实例化UiSettings类
         mapUiSettings.setZoomControlsEnabled(zoomControls);//显示缩放按钮
         mapUiSettings.setZoomPosition(ZOOM_POSITION_RIGHT_CENTER);//缩放按钮  右边界中部：ZOOM_POSITION_RIGHT_CENTER 右下：ZOOM_POSITION_RIGHT_BUTTOM。
@@ -174,7 +175,6 @@ public class RCTAMapView extends FrameLayout implements LocationSource, AMapLoca
         mapUiSettings.setCompassEnabled(compassEnable);//指南针
         mapUiSettings.setZoomGesturesEnabled(zoomGestures);//手势缩放
         mapUiSettings.setScaleControlsEnabled(scaleControls);//比例尺
-
         changeCamera(
                 CameraUpdateFactory.newCameraPosition(new CameraPosition(
                         latLng, (float) zoomLevel, 30, 0)));
@@ -182,12 +182,20 @@ public class RCTAMapView extends FrameLayout implements LocationSource, AMapLoca
         hasLocationMarker = true;
         addLocationMarker(latLng, RADIUS, mLocMarker);
 
-        AMAP.setLocationSource(this);// 设置定位监听
+//        AMAP.setLocationSource(this);// 设置定位监听,会影响小蓝点定位显示
         AMAP.setOnCameraChangeListener(this);// 对amap添加移动地图事件监听器
         mapUiSettings.setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
-        AMAP.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
 
 
+        MyLocationStyle myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_FOLLOW_NO_CENTER);
+        myLocationStyle.showMyLocation(true);
+        myLocationStyle.myLocationIcon(BitmapDescriptorFactory
+                .fromResource(R.drawable.blue));// 设置小蓝点的图标
+        myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
+        myLocationStyle.radiusFillColor(Color.argb(100, 135, 206, 250));
+        AMAP.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
+        AMAP.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
     }
 
     /**
@@ -273,7 +281,7 @@ public class RCTAMapView extends FrameLayout implements LocationSource, AMapLoca
 
     @Override
     public void onLocationChanged(AMapLocation amapLocation) {
-
+        Log.e("RCTAMapView","onLocationChanged");
 //        if (!isFirstMove) {
 //            isFirstMove = true;
 //        }
@@ -327,8 +335,11 @@ public class RCTAMapView extends FrameLayout implements LocationSource, AMapLoca
      * 获得当前控件中心点坐标
      */
     public void setCenterLocation(double latitude, double longitude) {
+        Log.e("setCenterLocation","setCenterLocation");
         LatLng latlng = new LatLng(latitude, longitude);
-        AMAP.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, (float)zoomLevel));
+        if(AMAP != null){
+            AMAP.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, (float)zoomLevel));
+        }
 //    addMarkersToMap(latlng);
     }
 
@@ -430,9 +441,14 @@ public class RCTAMapView extends FrameLayout implements LocationSource, AMapLoca
         mlocationClient = null;
     }
 
+
+    @Override
+    public void onMyLocationChange(Location location) {
+        Log.e("RCTAMapView","onMyLocationChange:"+location.toString());
+    }
+
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-
 
     }
 

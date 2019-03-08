@@ -42,6 +42,7 @@ public class RCTAMapModule extends ReactContextBaseJavaModule implements PoiSear
                 if(options.hasKey("centerCoordinate")) {
                     ReadableMap centerCoordinateMap = options.getMap("centerCoordinate");
                     mapView.setLatLng(new LatLng(centerCoordinateMap.getDouble("latitude"), centerCoordinateMap.getDouble("longitude")));
+                    mapView.setCenterLocation(centerCoordinateMap.getDouble("latitude"), centerCoordinateMap.getDouble("longitude"));
                 }
                 if(options.hasKey("zoomLevel")) {
                     double zoomLevel = options.getDouble("zoomLevel");
