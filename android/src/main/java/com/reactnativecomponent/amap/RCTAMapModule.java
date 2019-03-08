@@ -98,6 +98,46 @@ public class RCTAMapModule extends ReactContextBaseJavaModule implements PoiSear
         poiSearch.searchPOIAsyn();
     }
 
+    @ReactMethod
+    public void searchPoiByKeyWords(ReadableMap params) {
+
+        String types = "";
+        if(params.hasKey("types")) {
+            types = params.getString("types");
+        }
+        String keywords = "";
+        if(params.hasKey("keywords")) {
+            keywords = params.getString("keywords");
+        }
+
+        PoiSearch.Query query = new PoiSearch.Query(keywords, types);
+
+        if(params.hasKey("offset")) {
+            int offset = params.getInt("offset");
+            query.setPageSize(offset);// 设置每页最多返回多少条poiitem
+        }
+        if(params.hasKey("page")) {
+            int page = params.getInt("page");
+            query.setPageNum(page);//设置查询页码
+        }
+
+        if(params.hasKey("cityLimit")) {
+            boolean cityLimit = params.getBoolean("cityLimit");
+            query.setCityLimit(cityLimit);//设置查询页码
+        }
+
+
+        if(params.hasKey("coordinate")){
+            ReadableMap coordinateMap = params.getMap("coordinate");
+            double latitude = coordinateMap.getDouble("latitude");
+            double longitude = coordinateMap.getDouble("longitude");
+            query.setLocation(new LatLonPoint(latitude, longitude));
+        }
+        poiSearch.setQuery(query);
+        poiSearch.setOnPoiSearchListener(this);
+        poiSearch.searchPOIAsyn();
+    }
+
     @Override
     public void onPoiSearched(PoiResult result, int rCode) {
         List<PoiItem> poiItems;

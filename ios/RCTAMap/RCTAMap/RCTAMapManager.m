@@ -299,6 +299,66 @@ RCT_EXPORT_METHOD(searchPoiByCenterCoordinate:(NSDictionary *)params)
     [self.search AMapPOIAroundSearch:request];
 }
 
+/* 根据关键字检索POI. */
+RCT_EXPORT_METHOD(searchPoiByKeyWords:(NSDictionary *)params)
+{
+    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
+    
+    if(params != nil) {
+        NSArray *keys = [params allKeys];
+        
+        if([keys containsObject:@"types"]) {
+            NSString *types = [params objectForKey:@"types"];
+            request.types = types;
+        }
+        if([keys containsObject:@"sortrule"]) {
+            int sortrule = [[params objectForKey:@"sortrule"] intValue];
+            request.sortrule = sortrule;
+        }
+        if([keys containsObject:@"offset"]) {
+            int offset = [[params objectForKey:@"offset"] intValue];
+            request.offset = offset;
+        }
+        if([keys containsObject:@"page"]) {
+            int page = [[params objectForKey:@"page"] intValue];
+            request.page = page;
+        }
+        if([keys containsObject:@"requireExtension"]) {
+            BOOL requireExtension = [[params objectForKey:@"requireExtension"] boolValue];
+            request.requireExtension = requireExtension;
+        }
+        if([keys containsObject:@"requireSubPOIs"]) {
+            BOOL requireSubPOIs = [[params objectForKey:@"requireSubPOIs"] boolValue];
+            request.requireSubPOIs = requireSubPOIs;
+        }
+        
+        if([keys containsObject:@"cityLimit"]) {
+            BOOL requireSubPOIs = [[params objectForKey:@"cityLimit"] boolValue];
+            request.cityLimit = requireSubPOIs;
+        }
+        
+        if([keys containsObject:@"keywords"]) {
+            NSString *keywords = [params objectForKey:@"keywords"];
+            request.keywords = keywords;
+        }
+        
+        if([keys containsObject:@"city"]) {
+            NSString *keywords = [params objectForKey:@"city"];
+            request.keywords = keywords;
+        }
+        
+        if([keys containsObject:@"coordinate"]) {
+            NSDictionary *coordinate = [params objectForKey:@"coordinate"];
+            double latitude = [[coordinate objectForKey:@"latitude"] doubleValue];
+            double longitude = [[coordinate objectForKey:@"longitude"] doubleValue];
+            request.location = [AMapGeoPoint locationWithLatitude:latitude longitude:longitude];
+        }
+        
+    }
+
+    [self.search AMapPOIKeywordsSearch:request];
+}
+
 - (NSDictionary *)constantsToExport
 {
     return @{
@@ -354,6 +414,7 @@ RCT_EXPORT_METHOD(searchPoiByCenterCoordinate:(NSDictionary *)params)
                                           @"centerCoordinate": @{
                                                   @"latitude": @(mapView.centerCoordinate.latitude),
                                                   @"longitude": @(mapView.centerCoordinate.longitude),
+                                                  @"wasUserAction":@(wasUserAction)
                                                   }
                                           },
                                   });
